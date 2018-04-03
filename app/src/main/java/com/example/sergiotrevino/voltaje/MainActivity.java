@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,8 +24,9 @@ import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
-    Button btnConnect;
+    Button btnConnect, btnOffset, btnVoltaje, btnConfigurar;
     static TextView tvVoltaje1, tvVoltaje2, tvVoltaje3;
+    EditText etVoltaje;
     boolean connected = false;
     public static BluetoothDevice device;
     public static BluetoothSocket socket;
@@ -38,6 +40,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     static String a;
     static String tokens[];
 
+    static String control = "Status";
     static boolean socketConectado;
 
     @Override
@@ -45,12 +48,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         btnConnect = (Button) findViewById(R.id.btnConnect);
+        btnOffset = (Button) findViewById(R.id.btnOffset);
+        btnVoltaje = (Button) findViewById(R.id.btnGanancia);
+        btnConfigurar = (Button) findViewById(R.id.btnConfigurar);
         tvVoltaje1 = (TextView) findViewById(R.id.tvVoltaje1);
         tvVoltaje2 = (TextView) findViewById(R.id.tvVoltaje2);
         tvVoltaje3 = (TextView) findViewById(R.id.tvVoltaje3);
-
+        etVoltaje = (EditText) findViewById(R.id.etGanancia);
 
         btnConnect.setOnClickListener(this);
+        btnOffset.setOnClickListener(this);
+        btnVoltaje.setOnClickListener(this);
+        btnConfigurar.setOnClickListener(this);
     }
 
     //Identifica el device BT
@@ -148,7 +157,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             handler.post(new Runnable() {
                                 @Override
                                 public void run() {
-                                    if(s.contains("s,") && s.contains("&")){
+                                    if(s.contains("s,")){
                                         if(s.length() >= 26 && s.length() <= 34){
                                             //System.out.println("S: " + s);
                                             a = s.substring(s.indexOf("s,"), s.length() - 1);
@@ -177,13 +186,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         System.out.println(frase);
         tokens = frase.split(",");
         System.out.println("Tokens: " + Arrays.toString(tokens));
-        if (frase.contains("s") && tokens.length >= 8) {
+        if (frase.contains("s") && tokens.length > 6) {
             //System.out.println("Contains Status : ");
             float voltaje1, voltaje2, voltaje3;
             voltaje1 = Float.parseFloat(tokens[1]);
             voltaje2 = Float.parseFloat(tokens[2]);
             voltaje3 = Float.parseFloat(tokens[3]);
             tvVoltaje1.setText(Float.toString(voltaje1) + " V");
+            tvVoltaje2.setText(Float.toString(voltaje2) + " V");
+            tvVoltaje3.setText(Float.toString(voltaje3) + " V");
+
             System.out.println("Se cambió los voltajes a: " + Float.toString(voltaje1) + " " + Float.toString(voltaje2) + " " + Float.toString(voltaje3) );
 
         }
@@ -211,10 +223,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void resetFields(){
-       tvVoltaje1.setText("");
-       tvVoltaje2.setText("");
-       tvVoltaje3.setText("");
+       tvVoltaje1.setText("0");
+       tvVoltaje2.setText("0");
+       tvVoltaje3.setText("0");
 
+    }
+    public void showToast(final String toast)
+    {
+        runOnUiThread(new Runnable() {
+            public void run()
+            {
+                Toast.makeText(MainActivity.this, toast, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+    public void sendVoltaje(String voltaje) throws IOException{
+        System.out.println("Estoy en sendVoltaje");
+        String msg = "$AjGan," + voltaje + ",&";
+        System.out.println("Este es el comando de Ganancia que mandé: " + msg);
+        outputStream.write(msg.getBytes());
+    }
+    public void sendOffset() throws IOException{
+        System.out.println("Estoy en sendOffset");
+        String msg = "$AjOff&";
+        outputStream.write(msg.getBytes());
     }
     @Override
     public void onClick(View view) {
@@ -230,6 +262,45 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         desconectarBluetooth();
                     }
                     catch (IOException ex) { }
+                }
+                break;
+
+            case R.id.btnOffset:
+                if(connected) {
+                    try
+                    {
+                        sendOffset();
+                        showToast("Offset Configurado");
+                    }
+                    catch (IOException ex) { }
+                }else{
+                    showToast("Bluetooth desconectado");
+                }
+                break;
+
+            case R.id.btnGanancia:
+                if(connected) {
+                    if(etVoltaje.getText().toString() != null){
+                        try
+                        {
+                            sendVoltaje(etVoltaje.getText().toString());
+                            showToast("Voltaje Configurado");
+                        }
+                        catch (IOException ex) { }
+                    }else{
+                        showToast("Campo vacío");
+                    }
+                }else{
+                    showToast("Bluetooth desconectado");
+                }
+                break;
+
+            case R.id.btnConfigurar:
+                if(connected) {
+                    //Intent a ConfigurarActivity
+
+                }else{
+                    showToast("Bluetooth desconectado");
                 }
                 break;
         }
