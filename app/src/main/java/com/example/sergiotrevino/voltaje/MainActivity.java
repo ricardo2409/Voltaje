@@ -14,9 +14,12 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Set;
@@ -138,6 +141,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+
     void beginListenForData() {
         stopThread = false;
         thread = new Thread(new Runnable() {
@@ -165,7 +169,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                             readMessage(a);
                                         }
                                     }else{
-                                        //System.out.println("No leí nada");
+                                        System.out.println("Else");
+                                        System.out.println("S: " + s);
+
+                                        /*try
+                                        {
+                                            readBytesBufferedReader();
+
+                                        }
+                                        catch (IOException ex) { }
+                                        */
                                     }
                                 }
                             });
@@ -179,6 +192,209 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
         thread.start();
+    }
+
+    void sendPlus() throws IOException{
+
+        Runnable r = new Runnable() {
+            @Override
+            public void run(){
+
+                try
+                {
+                    System.out.println("Estoy en sendPlus");
+                    String msg = "+++";
+                    outputStream.write(msg.getBytes());
+                }
+                catch (IOException ex) { }
+
+            }
+        };
+
+        Handler h = new Handler();
+        h.postDelayed(r, 100);
+
+
+    }
+
+    //Manda "ATI5\r" al radio1
+    void sendData() throws IOException
+    {
+        Runnable r = new Runnable() {
+            @Override
+            public void run(){
+
+                try
+                {
+                    System.out.println("Estoy en sendData");
+                    String msg = "ATI5\r";
+                    outputStream.write(msg.getBytes());
+                }
+                catch (IOException ex) { }
+
+            }
+        };
+
+        Handler h = new Handler();
+        h.postDelayed(r, 100);
+
+
+    }
+
+    //Lee lo que le manda el radio cuando recibe "ATI5\r"
+    public void readBytesBufferedReader(String line) throws IOException{
+        System.out.println("Estoy en readBytesBufferedReader");
+        ArrayList<String> list = new ArrayList<String>();
+        //BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        for(int i = 0; i < 19; i++) {
+            list.add(line);
+            System.out.println(line);
+            // process line
+        }
+
+        System.out.println(list);
+        System.out.println();
+        readValues(list);
+        control = "Status";
+
+    }
+
+    //Función que recibe strings con todos los parámetros y retorna solo los valores
+    public ArrayList<String> readValues(ArrayList<String> lista) {
+        System.out.println("Estoy en readValues");
+        ArrayList<String> valores = new ArrayList<String>();
+        System.out.println("Size: " + lista.size());
+        System.out.println("Lista: " + lista);
+
+        for (int i = 0; i < lista.size(); i++) {
+            switch (i) {
+                case 0:
+                    System.out.println("i: " + i);
+                    System.out.println("ATI5");
+                    break;
+                case 1:
+                    System.out.println("i: " + i);
+                    System.out.println(lista.get(i));
+                    System.out.println("Numero leído: " + lista.get(i).substring(lista.get(i).indexOf('=') + 1, lista.get(i).length()));
+
+                    break;
+                case 2:
+                    System.out.println("i: " + i);
+                    System.out.println(lista.get(i));
+                    System.out.println("Numero leído: " + lista.get(i).substring(lista.get(i).indexOf('=') + 1, lista.get(i).length()));
+
+                    //NET ID
+
+                    break;
+                case 3:
+                    System.out.println("i: " + i);
+                    System.out.println(lista.get(i));
+                    System.out.println("Numero leído 1: " + lista.get(i).substring(lista.get(i).indexOf('=') + 1, lista.get(i).indexOf('=') + 3));
+                    System.out.println("Numero leído 2: " + lista.get(i).substring(lista.get(i).length() - 2 , lista.get(i).length()));
+
+                    //NODE ID
+
+                    break;
+                case 4:
+                    System.out.println("i: " + i);
+                    System.out.println(lista.get(i));
+                    System.out.println("Numero leído: " + lista.get(i).substring(lista.get(i).indexOf('=') + 1, lista.get(i).length()));
+
+                    break;
+                case 5:
+                    System.out.println("i: " + i);
+                    System.out.println(lista.get(i));
+                    System.out.println("Numero leído: " + lista.get(i).substring(lista.get(i).indexOf('=') + 1, lista.get(i).length()));
+                   //POWER
+                    break;
+                case 6:
+                    System.out.println("i: " + i);
+                    System.out.println(lista.get(i));
+                    System.out.println("Numero leído: " + lista.get(i).substring(lista.get(i).indexOf('=') + 1, lista.get(i).length()));
+
+                    break;
+                case 7:
+                    System.out.println("i: " + i);
+                    System.out.println(lista.get(i));
+                    System.out.println("Numero leído: " + lista.get(i).substring(lista.get(i).indexOf('=') + 1, lista.get(i).length()));
+
+                    break;
+                case 8:
+                    System.out.println("i: " + i);
+                    System.out.println(lista.get(i));
+                    System.out.println("Numero leído: " + lista.get(i).substring(lista.get(i).indexOf('=') + 1, lista.get(i).length()));
+
+                    break;
+                case 9:
+                    System.out.println("i: " + i);
+                    System.out.println(lista.get(i));
+                    System.out.println("Numero leído: " + lista.get(i).substring(lista.get(i).indexOf('=') + 1, lista.get(i).length()));
+
+                    break;
+                case 10:
+                    System.out.println("i: " + i);
+                    System.out.println(lista.get(i));
+                    System.out.println("Numero leído: " + lista.get(i).substring(lista.get(i).indexOf('=') + 1, lista.get(i).length()));
+
+                    break;
+                case 11:
+                    System.out.println("i: " + i);
+                    System.out.println(lista.get(i));
+                    System.out.println("Numero leído: " + lista.get(i).substring(lista.get(i).indexOf('=') + 1, lista.get(i).length()));
+
+                    break;
+                case 12:
+                    System.out.println("i: " + i);
+                    System.out.println(lista.get(i));
+                    System.out.println("Numero leído: " + lista.get(i).substring(lista.get(i).indexOf('=') + 1, lista.get(i).length()));
+
+                    break;
+                case 13:
+                    System.out.println("i: " + i);
+                    System.out.println(lista.get(i));
+                    System.out.println("Numero leído: " + lista.get(i).substring(lista.get(i).indexOf('=') + 1, lista.get(i).length()));
+
+                    break;
+                case 14:
+                    System.out.println("i: " + i);
+                    System.out.println(lista.get(i));
+                    System.out.println("Numero leído: " + lista.get(i).substring(lista.get(i).indexOf('=') + 1, lista.get(i).length()));
+
+                    break;
+                case 15:
+                    System.out.println("i: " + i);
+                    System.out.println(lista.get(i));
+                    System.out.println("Numero leído: " + lista.get(i).substring(lista.get(i).indexOf('=') + 1, lista.get(i).length()));
+                    //
+                    break;
+                case 16:
+                    System.out.println("i: " + i);
+                    System.out.println(lista.get(i));
+                    System.out.println("Numero leído: " + lista.get(i).substring(lista.get(i).indexOf('=') + 1, lista.get(i).length()));
+
+                    break;
+                case 17:
+                    System.out.println("i: " + i);
+                    System.out.println(lista.get(i));
+                    System.out.println("Numero leído: " + lista.get(i).substring(lista.get(i).indexOf('=') + 1, lista.get(i).length()));
+
+                    break;
+                case 18:
+                    System.out.println("i: " + i);
+                    System.out.println(lista.get(i));
+                    System.out.println("Numero leído: " + lista.get(i).substring(lista.get(i).indexOf('=') + 1, lista.get(i).length()));
+
+
+                    break;
+                default:
+                    System.out.println("Error");
+                    break;
+            }
+
+        }
+        System.out.println(valores);
+        return valores;
+
     }
 
     public static void readMessage(String frase)  {
@@ -248,6 +464,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         String msg = "$AjOff&";
         outputStream.write(msg.getBytes());
     }
+
+    void sendRadOn() throws IOException{
+
+        Runnable r = new Runnable() {
+            @Override
+            public void run(){
+
+                try
+                {
+                    System.out.println("Estoy en el RadOn de Register");
+                    //Para evitar que siga mandando la cadena y poder entrar al radio
+                    String msg1 = "$RadOn&";
+                    outputStream.write(msg1.getBytes()); //<-- put your code in here.
+                }
+                catch (IOException ex) { }
+
+            }
+        };
+
+        Handler h = new Handler();
+        h.postDelayed(r, 1);
+    }
+
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
@@ -280,7 +519,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             case R.id.btnGanancia:
                 if(connected) {
-                    if(etVoltaje.getText().toString() != null){
+                    if(!etVoltaje.getText().toString().matches("")){
                         try
                         {
                             sendVoltaje(etVoltaje.getText().toString());
@@ -298,6 +537,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btnConfigurar:
                 if(connected) {
                     //Intent a ConfigurarActivity
+                    try
+                    {
+                        System.out.println("Boton Configurar");
+                        sendRadOn();
+                        sendPlus();
+                        sendData();
+                    }
+                    catch (IOException ex) { }
+
+
 
                 }else{
                     showToast("Bluetooth desconectado");
