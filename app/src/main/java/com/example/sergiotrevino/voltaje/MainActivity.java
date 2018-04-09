@@ -170,36 +170,34 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                             readMessage(a);
                                         }
                                     }else{
+                                        System.out.println("No es status: " + s);
+
                                         if(control.matches("Config")){
                                             System.out.println("Config");
+                                            System.out.println("Este es el atributo: " + atributo);
 
-                                            System.out.println("Esto es controlRead: " + controlread);
-                                            System.out.println("Atributo: " + atributo);
-
-                                            if(controlread < 3){
-                                                switch (atributo){
-                                                    case "Power":
-                                                        //readPower(s);
-                                                        break;
-                                                    case "NetID":
-                                                        //readNetID(s);
-                                                        break;
-                                                    case "NodeID":
-                                                        //readNodeID(s);
-                                                        break;
-                                                }
-                                            }else {
-                                                //Ya se completaron las 3 leídas
-                                                /*
-                                                try
-                                                {
-                                                    sendRadOff();
-                                                }
-                                                catch (IOException ex) { }
-                                                */
-
-
-                                                changeStatus();
+                                            switch (atributo){
+                                                case "Power":
+                                                    if(s.length() <= 8 && s.length() >= 4){
+                                                        readPower(s);
+                                                    }else{
+                                                        System.out.println("No es lo que quiero de Power");
+                                                    }
+                                                    break;
+                                                case "NetID":
+                                                    if(s.length() <= 8 && s.length() >= 4){
+                                                        readNetID(s);
+                                                    }else{
+                                                        System.out.println("No es lo que quiero de NetID");
+                                                    }
+                                                    break;
+                                                case "NodeID":
+                                                    if(s.length() <= 8 && s.length() >= 4){
+                                                        readNodeID(s);
+                                                    }else{
+                                                        System.out.println("No es lo que quiero de NodeID");
+                                                    }
+                                                    break;
                                             }
 
 
@@ -252,7 +250,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         };
         Handler h = new Handler();
-        h.postDelayed(r, 300);
+        h.postDelayed(r, 1000);
     }
 
     void sendPower() throws IOException
@@ -271,7 +269,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         };
         Handler h = new Handler();
-        h.postDelayed(r, 300);
+        h.postDelayed(r, 2000);
     }
 
     void sendNodeID() throws IOException
@@ -291,7 +289,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         };
         Handler h = new Handler();
-        h.postDelayed(r, 300);
+        h.postDelayed(r, 3000);
     }
 
     void sendRadOn() throws IOException{
@@ -311,12 +309,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     //Para evitar que siga mandando la cadena y poder entrar al radio
                     String msg1 = "$RadOff,&";
                     outputStream.write(msg1.getBytes());
+                    changeStatus();
                 } catch (IOException ex) {
                 }
             }
         };
         Handler h = new Handler();
-        h.postDelayed(r, 500);
+        h.postDelayed(r, 1500);
     }
 
 
@@ -333,11 +332,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     potenciaValue = line.substring(line.lastIndexOf("]") + 2, line.length() - 1);
                     System.out.println("Esto tiene potenciaValue: " + potenciaValue);
                 }
+                try
+                {
+                    sendRadOff();
 
+                }
+                catch (IOException ex) { }
             }
         };
         Handler h = new Handler();
-        h.postDelayed(r, 100);
+        h.postDelayed(r, 10);
 
 
 
@@ -350,17 +354,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void run(){
 
-                controlread++;
                 System.out.println("Esta es la linea que lee NetID: " + line + " Este es su tamaño: " + line.length());
                 if(line.length() > 5){
                     netIDValue = line.substring(line.lastIndexOf("]") + 2, line.length() - 1);
                     System.out.println("Esto tiene netIDvalue: " + netIDValue);
                 }
+                atributo = "Power";
 
             }
         };
         Handler h = new Handler();
-        h.postDelayed(r, 100);
+        h.postDelayed(r, 10);
 
     }
 
@@ -380,7 +384,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         };
         Handler h = new Handler();
-        h.postDelayed(r, 100);
+        h.postDelayed(r, 20);
 
 
 
@@ -557,14 +561,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         sendRadOn();
                         sendCommand();
                         control = "Config";
-                        controlread = 0;
                         sendNetID();
-                        readNetID(s);
                         sendPower();
-                        readPower(s);
                         sendNodeID();
-                        readNodeID(s);
-                        sendRadOff();
 
 
                         executeIntent();
