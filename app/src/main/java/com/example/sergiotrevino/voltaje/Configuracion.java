@@ -21,8 +21,10 @@ public class Configuracion extends AppCompatActivity implements View.OnClickList
 
 
         Intent intent = getIntent();
-        String value = intent.getStringExtra("NetID");
-        System.out.println("Esto tiene value: " + value);
+        String netID = intent.getStringExtra("NetID");
+        String nodeID = intent.getStringExtra("NodeID");
+        String potencia = intent.getStringExtra("Potencia");
+        System.out.println("Esto tiene value: " + netID);
 
 
         etNodeID = (EditText) findViewById(R.id.etNodeID);
@@ -32,7 +34,7 @@ public class Configuracion extends AppCompatActivity implements View.OnClickList
         btnConfigurar = (Button) findViewById(R.id.btnConfigurar);
         btnConfigurar.setOnClickListener(this);
 
-        etNetID.setText(value);
+
 
     }
 
@@ -41,8 +43,12 @@ public class Configuracion extends AppCompatActivity implements View.OnClickList
         super.onStart();
         System.out.println("OnStart");
         Intent intent = getIntent();
-        String value = intent.getStringExtra("NetID");
-        System.out.println("Esto tiene value: " + value);
+        String netID = intent.getStringExtra("NetID");
+        String nodeID = intent.getStringExtra("NodeID");
+        String potencia = intent.getStringExtra("Potencia");
+        etNetID.setText(netID);
+        etNodeID.setText(nodeID);
+        etPotencia.setText(potencia);
     }
 
     @Override

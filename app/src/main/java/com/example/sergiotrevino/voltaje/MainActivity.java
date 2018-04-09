@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     static String tokens[];
 
     static String control = "Status";
-    static String atributo;
+    static String atributo = "NetID";
 
     static boolean socketConectado;
     static int controlread = 1;
@@ -170,7 +170,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                             readMessage(a);
                                         }
                                     }else{
-                                        System.out.println("No es status: " + s);
+                                        System.out.println("No es status: " + s + " length: " + s.length());
 
                                         if(control.matches("Config")){
                                             System.out.println("Config");
@@ -178,24 +178,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                                             switch (atributo){
                                                 case "Power":
-                                                    if(s.length() <= 8 && s.length() >= 4){
+                                                    if(s.length() > 8 ){
                                                         readPower(s);
                                                     }else{
-                                                        System.out.println("No es lo que quiero de Power");
+                                                        System.out.println("No es lo que quiero de Power" + s.length());
                                                     }
                                                     break;
                                                 case "NetID":
-                                                    if(s.length() <= 8 && s.length() >= 4){
+                                                    if(s.length() > 8 ){
                                                         readNetID(s);
                                                     }else{
-                                                        System.out.println("No es lo que quiero de NetID");
+                                                        System.out.println("No es lo que quiero de NetID " + s.length());
                                                     }
                                                     break;
                                                 case "NodeID":
-                                                    if(s.length() <= 8 && s.length() >= 4){
+                                                    if(s.length() > 8 ){
                                                         readNodeID(s);
                                                     }else{
-                                                        System.out.println("No es lo que quiero de NodeID");
+                                                        System.out.println("No es lo que quiero de NodeID" + s.length());
                                                     }
                                                     break;
                                             }
@@ -236,12 +236,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     void sendNetID() throws IOException
     {
-        atributo = "NetID";
         Runnable r = new Runnable() {
             @Override
             public void run(){
                 try
                 {
+                    atributo = "NetID";
                     System.out.println("Estoy en sendNetID");
                     String msg = "ATS3?\r";
                     outputStream.write(msg.getBytes());
@@ -250,17 +250,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         };
         Handler h = new Handler();
-        h.postDelayed(r, 1000);
+        h.postDelayed(r, 500);
     }
 
     void sendPower() throws IOException
     {
-        atributo = "Power";
         Runnable r = new Runnable() {
             @Override
             public void run(){
                 try
                 {
+                    atributo = "Power";
                     System.out.println("Estoy en sendPower");
                     String msg = "ATS4?\r";
                     outputStream.write(msg.getBytes());
@@ -274,12 +274,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     void sendNodeID() throws IOException
     {
-        atributo = "NodeID";
         Runnable r = new Runnable() {
             @Override
             public void run(){
                 try
                 {
+                    atributo = "NodeID";
                     System.out.println("Estoy en sendNodeID");
                     String msg = "ATS15?\r";
                     outputStream.write(msg.getBytes());
@@ -324,9 +324,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void run(){
 
-                controlread++;
-                System.out.println("Power: " + line);
-
+                atributo = "NodeID";
                 System.out.println("Esta es la linea que lee Power: " + line + " Este es su tamaño: " + line.length());
                 if(line.length() > 5){
                     potenciaValue = line.substring(line.lastIndexOf("]") + 2, line.length() - 1);
@@ -354,17 +352,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void run(){
 
+                atributo = "Power";
                 System.out.println("Esta es la linea que lee NetID: " + line + " Este es su tamaño: " + line.length());
                 if(line.length() > 5){
                     netIDValue = line.substring(line.lastIndexOf("]") + 2, line.length() - 1);
                     System.out.println("Esto tiene netIDvalue: " + netIDValue);
                 }
-                atributo = "Power";
+
 
             }
         };
         Handler h = new Handler();
-        h.postDelayed(r, 10);
+        h.postDelayed(r, 800);
 
     }
 
@@ -488,17 +487,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 //Intent a ConfigurarActivity
                 Intent myIntent = new Intent(MainActivity.this, Configuracion.class);
-                System.out.println("Esto es lo que pongo en el intent: " + netIDValue);
+                System.out.println("Esto es lo que pongo en el intent de netIDvalue: " + netIDValue);
+                System.out.println("Esto es lo que pongo en el intent de nodeIDvalue: " + nodeIDvalue);
+                System.out.println("Esto es lo que pongo en el intent de powerValue: " + potenciaValue);
+
                 myIntent.putExtra("NetID", netIDValue);
-                //myIntent.putExtra("NodeID", nodeIDValue);
-                //myIntent.putExtra("Potencia", potenciaValue);
+                myIntent.putExtra("NodeID", nodeIDvalue);
+                myIntent.putExtra("Potencia", potenciaValue);
                 MainActivity.this.startActivity(myIntent);
 
             }
         };
 
         Handler h = new Handler();
-        h.postDelayed(r, 400);
+        h.postDelayed(r, 3500);
 
 
     }
