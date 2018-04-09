@@ -330,19 +330,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     potenciaValue = line.substring(line.lastIndexOf("]") + 2, line.length() - 1);
                     System.out.println("Esto tiene potenciaValue: " + potenciaValue);
                 }
-                try
-                {
-                    sendRadOff();
 
-                }
-                catch (IOException ex) { }
             }
         };
         Handler h = new Handler();
         h.postDelayed(r, 10);
-
-
-
 
     }
 
@@ -379,6 +371,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         nodeIDvalue = line.substring(line.lastIndexOf("]") + 2, line.length() - 1);
                         System.out.println("Esto tiene nodeIDvalue: " + nodeIDvalue);
                     }
+                    try
+                    {
+                        sendRadOff();
+
+                    }
+                    catch (IOException ex) { }
 
             }
         };
@@ -502,6 +500,86 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Handler h = new Handler();
         h.postDelayed(r, 3500);
 
+
+    }
+
+    public void writeNetID(final String netID) throws IOException{
+        Runnable r = new Runnable() {
+            @Override
+            public void run(){
+
+                try {
+                    String msg1 = "ATS3=" + netID + "\r";
+                    outputStream.write(msg1.getBytes());
+
+                } catch (IOException ex) {
+                }
+
+            }
+        };
+
+        Handler h = new Handler();
+        h.postDelayed(r, 100);
+
+    }
+
+    public void writeNodeID(final String nodeID) throws IOException{
+        Runnable r = new Runnable() {
+            @Override
+            public void run(){
+
+                try {
+                    String msg1 = "ATS15=" + nodeID + "\r";
+                    outputStream.write(msg1.getBytes());
+
+                } catch (IOException ex) {
+                }
+
+            }
+        };
+
+        Handler h = new Handler();
+        h.postDelayed(r, 200);
+
+    }
+
+    public void writePower(final String power) throws IOException{
+        Runnable r = new Runnable() {
+            @Override
+            public void run(){
+
+                try {
+                    String msg1 = "ATS4=" + power + "\r";
+                    outputStream.write(msg1.getBytes());
+
+                } catch (IOException ex) {
+                }
+
+            }
+        };
+
+        Handler h = new Handler();
+        h.postDelayed(r, 300);
+
+    }
+
+    public void saveValues() throws IOException{
+        Runnable r = new Runnable() {
+            @Override
+            public void run(){
+
+                try {
+                    String msg1 = "AT&W=\r";
+                    outputStream.write(msg1.getBytes());
+
+                } catch (IOException ex) {
+                }
+
+            }
+        };
+
+        Handler h = new Handler();
+        h.postDelayed(r, 400);
 
     }
 

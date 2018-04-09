@@ -6,11 +6,18 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
+
+import java.io.IOException;
 
 public class Configuracion extends AppCompatActivity implements View.OnClickListener {
 
     EditText etNodeID, etNetID, etPotencia;
     Button btnConfigurar;
+    private MainActivity mainActivity;
+    private Configuracion(MainActivity activity) {
+        mainActivity = activity;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,8 +58,38 @@ public class Configuracion extends AppCompatActivity implements View.OnClickList
         etPotencia.setText(potencia);
     }
 
+    public void showToast(final String toast)
+    {
+        runOnUiThread(new Runnable() {
+            public void run()
+            {
+                Toast.makeText(Configuracion.this, toast, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
     @Override
     public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.btnConfigurar:
+                //Valida y Escribe los valores
+                if (!etPotencia.getText().toString().matches("") && !etNodeID.getText().toString().matches("") && !etNetID.getText().toString().matches("")) {
+                   if(Integer.parseInt(etPotencia.getText().toString()) > 0 && Integer.parseInt(etPotencia.getText().toString()) < 999 && Integer.parseInt(etNodeID.getText().toString()) > 0 && Integer.parseInt(etNodeID.getText().toString()) < 100000 && Integer.parseInt(etNetID.getText().toString()) > 0 && Integer.parseInt(etPotencia.getText().toString()) < 999){
+                       //Escribe los valores
+                       try{
+                           mainActivity.writeNetID(etNetID.getText().toString());
+                           mainActivity.writeNodeID(etNodeID.getText().toString());
+                           mainActivity.writePower(etPotencia.getText().toString());
+                           mainActivity.saveValues();
 
+                       }catch (IOException e){}
+                   }else{
+                       showToast("Números fuera del límite");
+                   }
+
+                } else {
+                    showToast("Favor de llenar todos los campos");
+                }
+                break;
+        }
     }
 }
