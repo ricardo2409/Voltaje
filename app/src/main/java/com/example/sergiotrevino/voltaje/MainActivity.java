@@ -24,6 +24,8 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
@@ -44,8 +46,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     static String tokens[];
 
     static String control = "Status";
-    static boolean socketConectado;
+    static String atributo;
 
+    static boolean socketConectado;
+    static int controlread = 1;
+    String netIDValue, potenciaValue, nodeIDvalue;
+
+    ArrayList<String> list = new ArrayList<String>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -148,37 +155,55 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void run() {
                 while(!Thread.currentThread().isInterrupted() && !stopThread) {
                     try {
-                        //waitMs(1000);
                         final int byteCount = inputStream.available();
                         if(byteCount > 0) {
-                            //try{ thread.sleep(100); }catch(InterruptedException e){ }
                             byte[] packetBytes = new byte[byteCount];
                             inputStream.read(packetBytes);
                             s = new String(packetBytes);
-                            System.out.println("Linea: " + s);
-                            //waitMs(1000);
 
                             handler.post(new Runnable() {
                                 @Override
                                 public void run() {
                                     if(s.contains("s,")){
                                         if(s.length() >= 26 && s.length() <= 34){
-                                            //System.out.println("S: " + s);
                                             a = s.substring(s.indexOf("s,"), s.length() - 1);
-                                            System.out.println("A: " + a);
                                             readMessage(a);
                                         }
                                     }else{
-                                        System.out.println("Else");
-                                        System.out.println("S: " + s);
+                                        if(control.matches("Config")){
+                                            System.out.println("Config");
 
-                                        /*try
-                                        {
-                                            readBytesBufferedReader();
+                                            System.out.println("Esto es controlRead: " + controlread);
+                                            System.out.println("Atributo: " + atributo);
+
+                                            if(controlread < 3){
+                                                switch (atributo){
+                                                    case "Power":
+                                                        //readPower(s);
+                                                        break;
+                                                    case "NetID":
+                                                        //readNetID(s);
+                                                        break;
+                                                    case "NodeID":
+                                                        //readNodeID(s);
+                                                        break;
+                                                }
+                                            }else {
+                                                //Ya se completaron las 3 leídas
+                                                /*
+                                                try
+                                                {
+                                                    sendRadOff();
+                                                }
+                                                catch (IOException ex) { }
+                                                */
+
+
+                                                changeStatus();
+                                            }
+
 
                                         }
-                                        catch (IOException ex) { }
-                                        */
                                     }
                                 }
                             });
@@ -194,216 +219,201 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         thread.start();
     }
 
-    void sendPlus() throws IOException{
-
+    void sendCommand() throws IOException{
         Runnable r = new Runnable() {
             @Override
             public void run(){
-
                 try
                 {
-                    System.out.println("Estoy en sendPlus");
+                    System.out.println("Estoy en sendCommand");
                     String msg = "+++";
                     outputStream.write(msg.getBytes());
                 }
                 catch (IOException ex) { }
-
             }
         };
-
         Handler h = new Handler();
         h.postDelayed(r, 100);
-
-
     }
 
-    //Manda "ATI5\r" al radio1
-    void sendData() throws IOException
+    void sendNetID() throws IOException
     {
+        atributo = "NetID";
         Runnable r = new Runnable() {
             @Override
             public void run(){
-
                 try
                 {
-                    System.out.println("Estoy en sendData");
-                    String msg = "ATI5\r";
+                    System.out.println("Estoy en sendNetID");
+                    String msg = "ATS3?\r";
+                    outputStream.write(msg.getBytes());
+                }
+                catch (IOException ex) { }
+            }
+        };
+        Handler h = new Handler();
+        h.postDelayed(r, 300);
+    }
+
+    void sendPower() throws IOException
+    {
+        atributo = "Power";
+        Runnable r = new Runnable() {
+            @Override
+            public void run(){
+                try
+                {
+                    System.out.println("Estoy en sendPower");
+                    String msg = "ATS4?\r";
+                    outputStream.write(msg.getBytes());
+                }
+                catch (IOException ex) { }
+            }
+        };
+        Handler h = new Handler();
+        h.postDelayed(r, 300);
+    }
+
+    void sendNodeID() throws IOException
+    {
+        atributo = "NodeID";
+        Runnable r = new Runnable() {
+            @Override
+            public void run(){
+                try
+                {
+                    System.out.println("Estoy en sendNodeID");
+                    String msg = "ATS15?\r";
                     outputStream.write(msg.getBytes());
                 }
                 catch (IOException ex) { }
 
             }
         };
+        Handler h = new Handler();
+        h.postDelayed(r, 300);
+    }
 
+    void sendRadOn() throws IOException{
+
+        System.out.println("Estoy en el RadOn");
+        //Para evitar que siga mandando la cadena y poder entrar al radio
+        String msg1 = "$RadOn,&";
+        outputStream.write(msg1.getBytes()); //<-- put your code in here.
+    }
+
+    void sendRadOff() throws IOException {
+        Runnable r = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    System.out.println("Estoy en el RadOff");
+                    //Para evitar que siga mandando la cadena y poder entrar al radio
+                    String msg1 = "$RadOff,&";
+                    outputStream.write(msg1.getBytes());
+                } catch (IOException ex) {
+                }
+            }
+        };
+        Handler h = new Handler();
+        h.postDelayed(r, 500);
+    }
+
+
+    void readPower(final String line){
+        Runnable r = new Runnable() {
+            @Override
+            public void run(){
+
+                controlread++;
+                System.out.println("Power: " + line);
+
+                System.out.println("Esta es la linea que lee Power: " + line + " Este es su tamaño: " + line.length());
+                if(line.length() > 5){
+                    potenciaValue = line.substring(line.lastIndexOf("]") + 2, line.length() - 1);
+                    System.out.println("Esto tiene potenciaValue: " + potenciaValue);
+                }
+
+            }
+        };
         Handler h = new Handler();
         h.postDelayed(r, 100);
 
 
-    }
 
-    //Lee lo que le manda el radio cuando recibe "ATI5\r"
-    public void readBytesBufferedReader(String line) throws IOException{
-        System.out.println("Estoy en readBytesBufferedReader");
-        ArrayList<String> list = new ArrayList<String>();
-        //BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        for(int i = 0; i < 19; i++) {
-            list.add(line);
-            System.out.println(line);
-            // process line
-        }
-
-        System.out.println(list);
-        System.out.println();
-        readValues(list);
-        control = "Status";
 
     }
 
-    //Función que recibe strings con todos los parámetros y retorna solo los valores
-    public ArrayList<String> readValues(ArrayList<String> lista) {
-        System.out.println("Estoy en readValues");
-        ArrayList<String> valores = new ArrayList<String>();
-        System.out.println("Size: " + lista.size());
-        System.out.println("Lista: " + lista);
+    void readNetID(final String line){
 
-        for (int i = 0; i < lista.size(); i++) {
-            switch (i) {
-                case 0:
-                    System.out.println("i: " + i);
-                    System.out.println("ATI5");
-                    break;
-                case 1:
-                    System.out.println("i: " + i);
-                    System.out.println(lista.get(i));
-                    System.out.println("Numero leído: " + lista.get(i).substring(lista.get(i).indexOf('=') + 1, lista.get(i).length()));
+        Runnable r = new Runnable() {
+            @Override
+            public void run(){
 
-                    break;
-                case 2:
-                    System.out.println("i: " + i);
-                    System.out.println(lista.get(i));
-                    System.out.println("Numero leído: " + lista.get(i).substring(lista.get(i).indexOf('=') + 1, lista.get(i).length()));
+                controlread++;
+                System.out.println("Esta es la linea que lee NetID: " + line + " Este es su tamaño: " + line.length());
+                if(line.length() > 5){
+                    netIDValue = line.substring(line.lastIndexOf("]") + 2, line.length() - 1);
+                    System.out.println("Esto tiene netIDvalue: " + netIDValue);
+                }
 
-                    //NET ID
-
-                    break;
-                case 3:
-                    System.out.println("i: " + i);
-                    System.out.println(lista.get(i));
-                    System.out.println("Numero leído 1: " + lista.get(i).substring(lista.get(i).indexOf('=') + 1, lista.get(i).indexOf('=') + 3));
-                    System.out.println("Numero leído 2: " + lista.get(i).substring(lista.get(i).length() - 2 , lista.get(i).length()));
-
-                    //NODE ID
-
-                    break;
-                case 4:
-                    System.out.println("i: " + i);
-                    System.out.println(lista.get(i));
-                    System.out.println("Numero leído: " + lista.get(i).substring(lista.get(i).indexOf('=') + 1, lista.get(i).length()));
-
-                    break;
-                case 5:
-                    System.out.println("i: " + i);
-                    System.out.println(lista.get(i));
-                    System.out.println("Numero leído: " + lista.get(i).substring(lista.get(i).indexOf('=') + 1, lista.get(i).length()));
-                   //POWER
-                    break;
-                case 6:
-                    System.out.println("i: " + i);
-                    System.out.println(lista.get(i));
-                    System.out.println("Numero leído: " + lista.get(i).substring(lista.get(i).indexOf('=') + 1, lista.get(i).length()));
-
-                    break;
-                case 7:
-                    System.out.println("i: " + i);
-                    System.out.println(lista.get(i));
-                    System.out.println("Numero leído: " + lista.get(i).substring(lista.get(i).indexOf('=') + 1, lista.get(i).length()));
-
-                    break;
-                case 8:
-                    System.out.println("i: " + i);
-                    System.out.println(lista.get(i));
-                    System.out.println("Numero leído: " + lista.get(i).substring(lista.get(i).indexOf('=') + 1, lista.get(i).length()));
-
-                    break;
-                case 9:
-                    System.out.println("i: " + i);
-                    System.out.println(lista.get(i));
-                    System.out.println("Numero leído: " + lista.get(i).substring(lista.get(i).indexOf('=') + 1, lista.get(i).length()));
-
-                    break;
-                case 10:
-                    System.out.println("i: " + i);
-                    System.out.println(lista.get(i));
-                    System.out.println("Numero leído: " + lista.get(i).substring(lista.get(i).indexOf('=') + 1, lista.get(i).length()));
-
-                    break;
-                case 11:
-                    System.out.println("i: " + i);
-                    System.out.println(lista.get(i));
-                    System.out.println("Numero leído: " + lista.get(i).substring(lista.get(i).indexOf('=') + 1, lista.get(i).length()));
-
-                    break;
-                case 12:
-                    System.out.println("i: " + i);
-                    System.out.println(lista.get(i));
-                    System.out.println("Numero leído: " + lista.get(i).substring(lista.get(i).indexOf('=') + 1, lista.get(i).length()));
-
-                    break;
-                case 13:
-                    System.out.println("i: " + i);
-                    System.out.println(lista.get(i));
-                    System.out.println("Numero leído: " + lista.get(i).substring(lista.get(i).indexOf('=') + 1, lista.get(i).length()));
-
-                    break;
-                case 14:
-                    System.out.println("i: " + i);
-                    System.out.println(lista.get(i));
-                    System.out.println("Numero leído: " + lista.get(i).substring(lista.get(i).indexOf('=') + 1, lista.get(i).length()));
-
-                    break;
-                case 15:
-                    System.out.println("i: " + i);
-                    System.out.println(lista.get(i));
-                    System.out.println("Numero leído: " + lista.get(i).substring(lista.get(i).indexOf('=') + 1, lista.get(i).length()));
-                    //
-                    break;
-                case 16:
-                    System.out.println("i: " + i);
-                    System.out.println(lista.get(i));
-                    System.out.println("Numero leído: " + lista.get(i).substring(lista.get(i).indexOf('=') + 1, lista.get(i).length()));
-
-                    break;
-                case 17:
-                    System.out.println("i: " + i);
-                    System.out.println(lista.get(i));
-                    System.out.println("Numero leído: " + lista.get(i).substring(lista.get(i).indexOf('=') + 1, lista.get(i).length()));
-
-                    break;
-                case 18:
-                    System.out.println("i: " + i);
-                    System.out.println(lista.get(i));
-                    System.out.println("Numero leído: " + lista.get(i).substring(lista.get(i).indexOf('=') + 1, lista.get(i).length()));
-
-
-                    break;
-                default:
-                    System.out.println("Error");
-                    break;
             }
+        };
+        Handler h = new Handler();
+        h.postDelayed(r, 100);
 
-        }
-        System.out.println(valores);
-        return valores;
+    }
+
+    void readNodeID(final String line){
+        Runnable r = new Runnable() {
+            @Override
+            public void run(){
+
+                    controlread++;
+                    System.out.println("NodeID: " + line);
+                    System.out.println("Esta es la linea que lee NodeID: " + line + " Este es su tamaño: " + line.length());
+                    if(line.length() > 5){
+                        nodeIDvalue = line.substring(line.lastIndexOf("]") + 2, line.length() - 1);
+                        System.out.println("Esto tiene nodeIDvalue: " + nodeIDvalue);
+                    }
+
+            }
+        };
+        Handler h = new Handler();
+        h.postDelayed(r, 100);
+
+
+
+    }
+
+    void changeStatus(){
+        Runnable r = new Runnable() {
+            @Override
+            public void run() {
+
+                control = "Status";
+                System.out.println("Status changed");
+
+            }
+        };
+
+        Handler h = new Handler();
+        h.postDelayed(r, 400);
+    }
+
+    public static boolean isStringANumber(String str) {
+        String regularExpression = "[-+]?[0-9]*\\.?[0-9]+$";
+        Pattern pattern = Pattern.compile(regularExpression);
+        Matcher matcher = pattern.matcher(str);
+        return matcher.matches();
 
     }
 
     public static void readMessage(String frase)  {
-        System.out.println("Estoy en el readMessage: ");
-        System.out.println(frase);
+
         tokens = frase.split(",");
         System.out.println("Tokens: " + Arrays.toString(tokens));
         if (frase.contains("s") && tokens.length > 6) {
-            //System.out.println("Contains Status : ");
             float voltaje1, voltaje2, voltaje3;
             voltaje1 = Float.parseFloat(tokens[1]);
             voltaje2 = Float.parseFloat(tokens[2]);
@@ -420,7 +430,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void desconectarBluetooth() throws IOException{
         //Desconectar bluetooth
         if(socketConectado){
-            System.out.println("Socket Conectado");
+            System.out.println("Socket Desconectado");
             outputStream.close();
             outputStream = null;
             inputStream.close();
@@ -459,33 +469,37 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         System.out.println("Este es el comando de Ganancia que mandé: " + msg);
         outputStream.write(msg.getBytes());
     }
+
     public void sendOffset() throws IOException{
         System.out.println("Estoy en sendOffset");
         String msg = "$AjOff&";
         outputStream.write(msg.getBytes());
     }
 
-    void sendRadOn() throws IOException{
+    public void executeIntent(){
 
         Runnable r = new Runnable() {
             @Override
             public void run(){
 
-                try
-                {
-                    System.out.println("Estoy en el RadOn de Register");
-                    //Para evitar que siga mandando la cadena y poder entrar al radio
-                    String msg1 = "$RadOn&";
-                    outputStream.write(msg1.getBytes()); //<-- put your code in here.
-                }
-                catch (IOException ex) { }
+                //Intent a ConfigurarActivity
+                Intent myIntent = new Intent(MainActivity.this, Configuracion.class);
+                System.out.println("Esto es lo que pongo en el intent: " + netIDValue);
+                myIntent.putExtra("NetID", netIDValue);
+                //myIntent.putExtra("NodeID", nodeIDValue);
+                //myIntent.putExtra("Potencia", potenciaValue);
+                MainActivity.this.startActivity(myIntent);
 
             }
         };
 
         Handler h = new Handler();
-        h.postDelayed(r, 1);
+        h.postDelayed(r, 400);
+
+
     }
+
+
 
     @Override
     public void onClick(View view) {
@@ -536,15 +550,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             case R.id.btnConfigurar:
                 if(connected) {
-                    //Intent a ConfigurarActivity
+
                     try
                     {
                         System.out.println("Boton Configurar");
                         sendRadOn();
-                        sendPlus();
-                        sendData();
+                        sendCommand();
+                        control = "Config";
+                        controlread = 0;
+                        sendNetID();
+                        readNetID(s);
+                        sendPower();
+                        readPower(s);
+                        sendNodeID();
+                        readNodeID(s);
+                        sendRadOff();
+
+
+                        executeIntent();
                     }
                     catch (IOException ex) { }
+
+
+
 
 
 
