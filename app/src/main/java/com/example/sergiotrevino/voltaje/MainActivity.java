@@ -178,24 +178,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                                             switch (atributo){
                                                 case "Power":
-                                                    if(s.length() > 8 ){
+                                                    if(s.length() >= 8 && s.contains("]")){
                                                         readPower(s);
                                                     }else{
                                                         System.out.println("No es lo que quiero de Power" + s.length());
                                                     }
                                                     break;
                                                 case "NetID":
-                                                    if(s.length() > 8 ){
+                                                    if(s.length() >= 7 && s.contains("]")){
                                                         readNetID(s);
                                                     }else{
                                                         System.out.println("No es lo que quiero de NetID " + s.length());
                                                     }
                                                     break;
                                                 case "NodeID":
-                                                    if(s.length() > 8 ){
+                                                    if(s.length() >= 8 && s.contains("]")){
                                                         readNodeID(s);
                                                     }else{
-                                                        System.out.println("No es lo que quiero de NodeID" + s.length());
+                                                        System.out.println("No es lo que quiero de NodeID " + s.length());
                                                     }
                                                     break;
                                             }
@@ -241,6 +241,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void run(){
                 try
                 {
+                    //Control para saber que leer
+                    control = "Config";
+                    //Lo que lee es sobre el netid
                     atributo = "NetID";
                     System.out.println("Estoy en sendNetID");
                     String msg = "ATS3?\r";
@@ -269,7 +272,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         };
         Handler h = new Handler();
-        h.postDelayed(r, 2000);
+        h.postDelayed(r, 1000);
     }
 
     void sendNodeID() throws IOException
@@ -289,7 +292,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         };
         Handler h = new Handler();
-        h.postDelayed(r, 3000);
+        h.postDelayed(r, 2000);
     }
 
     void sendRadOn() throws IOException{
@@ -315,7 +318,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         };
         Handler h = new Handler();
-        h.postDelayed(r, 1500);
+        h.postDelayed(r, 1000);
     }
 
 
@@ -343,20 +346,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Runnable r = new Runnable() {
             @Override
             public void run(){
-
                 atributo = "Power";
                 System.out.println("Esta es la linea que lee NetID: " + line + " Este es su tamaño: " + line.length());
                 if(line.length() > 5){
                     netIDValue = line.substring(line.lastIndexOf("]") + 2, line.length() - 1);
                     System.out.println("Esto tiene netIDvalue: " + netIDValue);
                 }
-
-
             }
         };
         Handler h = new Handler();
-        h.postDelayed(r, 800);
-
+        h.postDelayed(r, 30);
     }
 
     void readNodeID(final String line){
@@ -364,7 +363,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void run(){
 
-                    controlread++;
                     System.out.println("NodeID: " + line);
                     System.out.println("Esta es la linea que lee NodeID: " + line + " Este es su tamaño: " + line.length());
                     if(line.length() > 5){
@@ -489,10 +487,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 System.out.println("Esto es lo que pongo en el intent de nodeIDvalue: " + nodeIDvalue);
                 System.out.println("Esto es lo que pongo en el intent de powerValue: " + potenciaValue);
 
+                //Datos que se leen y mandan a la otra activity
                 myIntent.putExtra("NetID", netIDValue);
                 myIntent.putExtra("NodeID", nodeIDvalue);
                 myIntent.putExtra("Potencia", potenciaValue);
-                MainActivity.this.startActivity(myIntent);
+                MainActivity.this.startActivityForResult(myIntent, 2);
 
             }
         };
@@ -509,7 +508,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void run(){
 
                 try {
+                    System.out.println("Estoy en el WriteNetID");
                     String msg1 = "ATS3=" + netID + "\r";
+                    System.out.println(msg1);
                     outputStream.write(msg1.getBytes());
 
                 } catch (IOException ex) {
@@ -519,7 +520,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         };
 
         Handler h = new Handler();
-        h.postDelayed(r, 100);
+        h.postDelayed(r, 600);
 
     }
 
@@ -529,7 +530,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void run(){
 
                 try {
+                    System.out.println("Estoy en el WriteNodeID");
                     String msg1 = "ATS15=" + nodeID + "\r";
+                    System.out.println(msg1);
                     outputStream.write(msg1.getBytes());
 
                 } catch (IOException ex) {
@@ -539,7 +542,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         };
 
         Handler h = new Handler();
-        h.postDelayed(r, 200);
+        h.postDelayed(r, 500);
 
     }
 
@@ -549,27 +552,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void run(){
 
                 try {
+                    System.out.println("Estoy en el WritePower");
                     String msg1 = "ATS4=" + power + "\r";
-                    outputStream.write(msg1.getBytes());
-
-                } catch (IOException ex) {
-                }
-
-            }
-        };
-
-        Handler h = new Handler();
-        h.postDelayed(r, 300);
-
-    }
-
-    public void saveValues() throws IOException{
-        Runnable r = new Runnable() {
-            @Override
-            public void run(){
-
-                try {
-                    String msg1 = "AT&W=\r";
+                    System.out.println(msg1);
                     outputStream.write(msg1.getBytes());
 
                 } catch (IOException ex) {
@@ -583,7 +568,83 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+    public void writeDestination(final String destination) throws IOException{
+        Runnable r = new Runnable() {
+            @Override
+            public void run(){
 
+                try {
+                    System.out.println("Estoy en el WriteDestination");
+                    String msg1 = "ATS16=" + destination + "\r";
+                    System.out.println(msg1);
+                    outputStream.write(msg1.getBytes());
+
+                } catch (IOException ex) {
+                }
+
+            }
+        };
+
+        Handler h = new Handler();
+        h.postDelayed(r, 700);
+
+    }
+
+    public void saveValues() throws IOException{
+        Runnable r = new Runnable() {
+            @Override
+            public void run(){
+
+                try {
+                    System.out.println("Estoy en el SaveValues");
+                    String msg1 = "AT&W\r";
+                    outputStream.write(msg1.getBytes());
+                    sendRadOff();
+                    showToast("¡ Configuración Guardada !");
+
+                } catch (IOException ex) {
+                }
+
+            }
+        };
+
+        Handler h = new Handler();
+        h.postDelayed(r, 800);
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        System.out.println("Estoy en el Acitivity Result");
+        System.out.println("Result code: " + resultCode);
+        System.out.println("Request code: " + requestCode);
+
+
+        atributo = "NetID";
+        if(resultCode==2)
+        {
+            //do the things u wanted
+            String potencia=data.getExtras().getString("Potencia");
+            String netID=data.getExtras().getString("NetID");
+            String nodeID=data.getExtras().getString("NodeID");
+            String destination=data.getExtras().getString("Destination");
+            System.out.println("Estos son los valores que recibí: Potencia, netID, nodeID, destination " + potencia + " " + netID + " " + nodeID + " " + destination);
+            try {
+                sendRadOn();
+                sendCommand();
+                writePower(potencia);
+                writeNodeID(nodeID);
+                writeNetID(netID);
+                writeDestination(destination);
+                saveValues();
+
+
+            } catch (IOException ex) {
+            }
+
+        }
+    }
 
     @Override
     public void onClick(View view) {
@@ -634,27 +695,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             case R.id.btnConfigurar:
                 if(connected) {
-
                     try
                     {
                         System.out.println("Boton Configurar");
                         sendRadOn();
                         sendCommand();
-                        control = "Config";
+                        //control = "Config";
                         sendNetID();
                         sendPower();
                         sendNodeID();
-
-
                         executeIntent();
                     }
                     catch (IOException ex) { }
-
-
-
-
-
-
                 }else{
                     showToast("Bluetooth desconectado");
                 }

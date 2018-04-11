@@ -14,10 +14,6 @@ public class Configuracion extends AppCompatActivity implements View.OnClickList
 
     EditText etNodeID, etNetID, etPotencia;
     Button btnConfigurar;
-    private MainActivity mainActivity;
-    private Configuracion(MainActivity activity) {
-        mainActivity = activity;
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,11 +23,13 @@ public class Configuracion extends AppCompatActivity implements View.OnClickList
         System.out.println("OnCreate");
 
 
+        /*
         Intent intent = getIntent();
         String netID = intent.getStringExtra("NetID");
         String nodeID = intent.getStringExtra("NodeID");
         String potencia = intent.getStringExtra("Potencia");
         System.out.println("Esto tiene value: " + netID);
+        */
 
 
         etNodeID = (EditText) findViewById(R.id.etNodeID);
@@ -50,9 +48,14 @@ public class Configuracion extends AppCompatActivity implements View.OnClickList
         super.onStart();
         System.out.println("OnStart");
         Intent intent = getIntent();
-        String netID = intent.getStringExtra("NetID");
-        String nodeID = intent.getStringExtra("NodeID");
-        String potencia = intent.getStringExtra("Potencia");
+        String netID, nodeID, potencia;
+        netID = intent.getStringExtra("NetID");
+        nodeID = intent.getStringExtra("NodeID");
+        potencia = intent.getStringExtra("Potencia");
+        System.out.println("Esto tiene netID: " + netID);
+        System.out.println("Esto tiene nodeID: " + nodeID);
+        System.out.println("Esto tiene Potencia: " + potencia);
+
         etNetID.setText(netID);
         etNodeID.setText(nodeID);
         etPotencia.setText(potencia);
@@ -71,17 +74,35 @@ public class Configuracion extends AppCompatActivity implements View.OnClickList
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btnConfigurar:
+                System.out.println("Botón Configurar Valores");
                 //Valida y Escribe los valores
+                String stringPotencia, stringNetID, stringNodeID, stringDestination;
                 if (!etPotencia.getText().toString().matches("") && !etNodeID.getText().toString().matches("") && !etNetID.getText().toString().matches("")) {
-                   if(Integer.parseInt(etPotencia.getText().toString()) > 0 && Integer.parseInt(etPotencia.getText().toString()) < 999 && Integer.parseInt(etNodeID.getText().toString()) > 0 && Integer.parseInt(etNodeID.getText().toString()) < 100000 && Integer.parseInt(etNetID.getText().toString()) > 0 && Integer.parseInt(etPotencia.getText().toString()) < 999){
-                       //Escribe los valores
-                       try{
-                           mainActivity.writeNetID(etNetID.getText().toString());
-                           mainActivity.writeNodeID(etNodeID.getText().toString());
-                           mainActivity.writePower(etPotencia.getText().toString());
-                           mainActivity.saveValues();
+                    stringPotencia = etPotencia.getText().toString();
+                    stringNetID = etNetID.getText().toString();
+                    stringNodeID = etNodeID.getText().toString();
 
-                       }catch (IOException e){}
+                    if(Integer.parseInt(stringPotencia.trim()) >= 0 && Integer.parseInt(stringPotencia.trim()) <= 30 && Integer.parseInt(stringNetID.trim()) >= 0 && Integer.parseInt(stringNetID.trim()) <= 65535 && Integer.parseInt(stringNodeID.trim()) >= 0 && Integer.parseInt(stringNodeID.trim()) <= 30){
+
+                        if(Integer.parseInt(stringNodeID.trim()) == 0){
+                            System.out.println("NodeID igual a 0");
+                            stringDestination = "65535";
+                        }else{
+                            System.out.println("NodeID diferente a 0");
+                            stringDestination = "0";
+                        }
+
+                       Intent intent=new Intent();
+                       intent.putExtra("Potencia",stringPotencia);
+                       intent.putExtra("NetID",stringNetID);
+                       intent.putExtra("NodeID",stringNodeID);
+                       intent.putExtra("Destination",stringDestination);
+
+
+                       setResult(2,intent);
+                       finish();//finishing activity
+
+
                    }else{
                        showToast("Números fuera del límite");
                    }

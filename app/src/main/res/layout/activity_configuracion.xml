@@ -20,7 +20,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Node ID:"
-                android:textAppearance="@style/TextAppearance.AppCompat.Display2" />
+                android:textAppearance="@style/TextAppearance.AppCompat.Display2"
+                />
 
             <EditText
                 android:id="@+id/etNodeID"
@@ -30,8 +31,11 @@
                 android:layout_weight="1"
                 android:ems="10"
                 android:gravity="center_horizontal"
-                android:inputType="number"
-                android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
+                android:singleLine="false"
+                android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+                android:inputType="number|none"
+                android:maxLength="3"
+                android:digits="0123456789"/>
         </LinearLayout>
 
         <Space
