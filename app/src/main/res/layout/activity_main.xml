@@ -99,6 +99,8 @@
 
         </LinearLayout>
 
+
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="165dp"
@@ -110,7 +112,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:layout_weight="1"
-                android:text="Configuración"
+                android:text="Configuración del Radio"
                 android:textAppearance="@style/TextAppearance.AppCompat.Display1"
                 android:textColor="@android:color/black" />
 
@@ -123,6 +125,21 @@
                 android:textAppearance="@style/TextAppearance.AppCompat.Display1"
                 android:textColor="@android:color/black" />
 
+            <ProgressBar
+                android:id="@+id/progressBar1"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_weight="1"
+                android:indeterminate="true"
+                android:indeterminateTint="@color/colorPrimaryDark"
+                android:indeterminateTintMode="src_in"
+                android:progressBackgroundTintMode="src_in"
+                android:progressTint="@color/colorPrimaryDark"
+                android:progressTintMode="src_in" />
+
         </LinearLayout>
+
+
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>

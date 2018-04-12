@@ -1,5 +1,6 @@
 package com.example.sergiotrevino.voltaje;
 
+import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
@@ -11,6 +12,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -51,6 +54,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     static boolean socketConectado;
     static int controlread = 1;
     String netIDValue, potenciaValue, nodeIDvalue;
+    ProgressBar progressBar;
+
+    private int progressStatus = 0;
+
 
     ArrayList<String> list = new ArrayList<String>();
     @Override
@@ -65,6 +72,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         tvVoltaje2 = (TextView) findViewById(R.id.tvVoltaje2);
         tvVoltaje3 = (TextView) findViewById(R.id.tvVoltaje3);
         etVoltaje = (EditText) findViewById(R.id.etGanancia);
+
+        progressBar = (ProgressBar) findViewById(R.id.progressBar1);
+        progressBar.setVisibility(View.GONE);
+        progressStatus = 0;
 
         btnConnect.setOnClickListener(this);
         btnOffset.setOnClickListener(this);
@@ -131,11 +142,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void conectar() throws IOException{
+        System.out.println("ProgressBar Visible");
+        progressBar.setVisibility(View.VISIBLE);
+
         socket = device.createRfcommSocketToServiceRecord(PORT_UUID); //Crea un socket para manejar la conexión
         socket.connect();
         socketConectado = true;
         Log.d("Socket ", String.valueOf(socket.isConnected()));
         Toast.makeText(getApplicationContext(), "Conexión exitosa", Toast.LENGTH_SHORT).show();
+        progressBar.setVisibility(View.GONE);
+        System.out.println("ProgressBar Gone");
         connected = true;
         //tvConect.setText("Conectado a " + device.getName());
         btnConnect.setText("Desconectar módulo Bluetooth");
@@ -143,8 +159,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         inputStream = socket.getInputStream();
         beginListenForData();
 
-        //waitMs(5000);
-        //closeSocket();
+
+
 
     }
 
@@ -585,7 +601,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         };
 
-        
+
         Handler h = new Handler();
         h.postDelayed(r, 700);
 
