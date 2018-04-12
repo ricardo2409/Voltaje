@@ -36,6 +36,14 @@
                 android:inputType="number|none"
                 android:maxLength="3"
                 android:digits="0123456789"/>
+
+            <TextView
+                android:id="@+id/textView4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="( 0 - 30 )"
+                android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
         </LinearLayout>
 
         <Space
@@ -66,6 +74,14 @@
                 android:gravity="center_horizontal"
                 android:inputType="number"
                 android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
+
+            <TextView
+                android:id="@+id/textView5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="( 0 - 65535 )"
+                android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
         </LinearLayout>
 
         <Space
@@ -95,6 +111,14 @@
                 android:ems="10"
                 android:gravity="center_horizontal"
                 android:inputType="number"
+                android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
+
+            <TextView
+                android:id="@+id/textView6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="( 0 - 30 )"
                 android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
 
         </LinearLayout>
