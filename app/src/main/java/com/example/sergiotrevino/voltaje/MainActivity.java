@@ -363,18 +363,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void run(){
 
-                    System.out.println("NodeID: " + line);
-                    System.out.println("Esta es la linea que lee NodeID: " + line + " Este es su tamaño: " + line.length());
-                    if(line.length() > 5){
-                        nodeIDvalue = line.substring(line.lastIndexOf("]") + 2, line.length() - 1);
-                        System.out.println("Esto tiene nodeIDvalue: " + nodeIDvalue);
-                    }
-                    try
-                    {
-                        sendRadOff();
+                System.out.println("NodeID: " + line);
+                System.out.println("Esta es la linea que lee NodeID: " + line + " Este es su tamaño: " + line.length());
+                if(line.length() > 5){
+                    nodeIDvalue = line.substring(line.lastIndexOf("]") + 2, line.length() - 1);
+                    System.out.println("Esto tiene nodeIDvalue: " + nodeIDvalue);
+                }
+                try
+                {
+                    sendRadOff();
 
-                    }
-                    catch (IOException ex) { }
+                }
+                catch (IOException ex) { }
 
             }
         };
@@ -448,9 +448,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void resetFields(){
-       tvVoltaje1.setText("0");
-       tvVoltaje2.setText("0");
-       tvVoltaje3.setText("0");
+        tvVoltaje1.setText("0");
+        tvVoltaje2.setText("0");
+        tvVoltaje3.setText("0");
 
     }
     public void showToast(final String toast)
@@ -585,6 +585,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         };
 
+        
         Handler h = new Handler();
         h.postDelayed(r, 700);
 
