@@ -370,6 +370,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 System.out.println("Esta es la linea que lee NetID: " + line );
                 if(line.length() > 5){
                     netIDValue = line.substring(line.lastIndexOf("]") + 2, line.length() - 1);
+                    if(netIDValue.contains("?")){
+                        System.out.println("Sí contiene ?");
+                        netIDValue = netIDValue.substring(0, netIDValue.length() - 1);
+                    }
                     System.out.println("Esto tiene netIDvalue: " + netIDValue);
                 }
             }
@@ -540,7 +544,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         };
 
         Handler h = new Handler();
-        h.postDelayed(r, 700);
+        h.postDelayed(r, 800);
 
     }
 
@@ -587,7 +591,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         };
 
         Handler h = new Handler();
-        h.postDelayed(r, 500);
+        h.postDelayed(r, 700);
 
     }
 
@@ -610,7 +614,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
         Handler h = new Handler();
-        h.postDelayed(r, 800);
+        h.postDelayed(r, 900);
 
     }
 
@@ -633,7 +637,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         };
 
         Handler h = new Handler();
-        h.postDelayed(r, 900);
+        h.postDelayed(r, 1000);
 
     }
 
@@ -659,6 +663,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             try {
                 sendRadOn();
                 sendCommand();
+                writeNodeID(nodeID);
                 writeNodeID(nodeID);
                 writePower(Integer.toString(realPower));
                 writeNetID(netID);
