@@ -25,7 +25,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".Configuracion"
-            android:windowSoftInputMode="stateHidden"></activity>
+            android:windowSoftInputMode="stateHidden"
+            android:screenOrientation="landscape"></activity>
     </application>
 
 </manifest>

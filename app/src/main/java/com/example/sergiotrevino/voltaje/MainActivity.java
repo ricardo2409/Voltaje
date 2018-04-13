@@ -194,7 +194,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                                             switch (atributo){
                                                 case "Power":
-                                                    if(s.length() >= 8 && s.contains("]")){
+                                                    if(s.length() >= 6 && s.contains("]")){
                                                         readPower(s);
                                                     }else{
                                                         System.out.println("No es lo que quiero de Power" + s.length());
@@ -210,7 +210,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                                     }
                                                     break;
                                                 case "NodeID":
-                                                    if(s.length() >= 8 && s.contains("]")){
+                                                    if(s.length() >= 7 && s.contains("]")){
                                                         readNodeID(s);
                                                     }else{
                                                         System.out.println("No es lo que quiero de NodeID " + s.length());
@@ -355,7 +355,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 atributo = "NodeID";
                 System.out.println("Esta es la linea que lee Power: " + line );
                 if(line.length() > 5){
-                    potenciaValue = line.substring(line.lastIndexOf("]") + 2, line.length() - 1);
+                    potenciaValue = line.substring(line.lastIndexOf("]") + 2, line.lastIndexOf("\r"));
                     System.out.println("Esto tiene potenciaValue: " + potenciaValue);
                 }
 
