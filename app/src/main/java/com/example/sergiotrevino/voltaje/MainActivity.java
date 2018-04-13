@@ -143,15 +143,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void conectar() throws IOException{
         System.out.println("ProgressBar Visible");
-        progressBar.setVisibility(View.VISIBLE);
-
+        //progressBar.setVisibility(View.VISIBLE);
         socket = device.createRfcommSocketToServiceRecord(PORT_UUID); //Crea un socket para manejar la conexión
         socket.connect();
         socketConectado = true;
         Log.d("Socket ", String.valueOf(socket.isConnected()));
         Toast.makeText(getApplicationContext(), "Conexión exitosa", Toast.LENGTH_SHORT).show();
-        progressBar.setVisibility(View.GONE);
-        System.out.println("ProgressBar Gone");
+        //progressBar.setVisibility(View.INVISIBLE);
+        System.out.println("ProgressBar Invisible");
         connected = true;
         //tvConect.setText("Conectado a " + device.getName());
         btnConnect.setText("Desconectar módulo Bluetooth");
@@ -529,6 +528,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 myIntent.putExtra("NetID", netIDValue);
                 myIntent.putExtra("NodeID", nodeIDvalue);
                 myIntent.putExtra("Potencia", potenciaValue);
+
+                //Detener el progress bar
+                progressBar.setVisibility(View.GONE);
+
                 MainActivity.this.startActivityForResult(myIntent, 2);
 
             }
@@ -743,6 +746,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     try
                     {
                         System.out.println("Boton Configurar");
+                        progressBar.setVisibility(View.VISIBLE);
                         sendRadOn();
                         sendCommand();
                         //control = "Config";
