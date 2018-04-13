@@ -198,6 +198,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                                         readPower(s);
                                                     }else{
                                                         System.out.println("No es lo que quiero de Power" + s.length());
+                                                        System.out.println(s);
                                                     }
                                                     break;
                                                 case "NetID":
@@ -205,6 +206,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                                         readNetID(s);
                                                     }else{
                                                         System.out.println("No es lo que quiero de NetID " + s.length());
+                                                        System.out.println(s);
                                                     }
                                                     break;
                                                 case "NodeID":
@@ -212,6 +214,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                                         readNodeID(s);
                                                     }else{
                                                         System.out.println("No es lo que quiero de NodeID " + s.length());
+                                                        System.out.println(s);
                                                     }
                                                     break;
                                             }
@@ -265,6 +268,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     String msg = "ATS3?\r";
                     outputStream.write(msg.getBytes());
                     outputStream.write(msg.getBytes());
+                    outputStream.write(msg.getBytes());
+
                 }
                 catch (IOException ex) { }
             }
@@ -370,9 +375,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 System.out.println("Esta es la linea que lee NetID: " + line );
                 if(line.length() > 5){
                     netIDValue = line.substring(line.lastIndexOf("]") + 2, line.length() - 1);
-                    if(netIDValue.contains("?")){
+                    if(netIDValue.contains("?") || netIDValue.contains("T")){
                         System.out.println("Sí contiene ?");
-                        netIDValue = netIDValue.substring(0, netIDValue.length() - 1);
+                        netIDValue = netIDValue.substring(0, netIDValue.indexOf("\r"));
                     }
                     System.out.println("Esto tiene netIDvalue: " + netIDValue);
                 }
@@ -422,6 +427,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         Handler h = new Handler();
         h.postDelayed(r, 400);
+    }
+
+    public static final int lastAlphaNumeric(String s) {
+        for (int i = s.length() - 1; i >= 0; i--) {
+            char c = s.charAt(i);
+            if (Character.isLetter(c) || Character.isDigit(c))
+                return i;
+        }
+        return -1; // no alphanumeric character at all
     }
 
     public static boolean isStringANumber(String str) {
@@ -657,15 +671,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             String netID=data.getExtras().getString("NetID");
             String nodeID=data.getExtras().getString("NodeID");
             String destination=data.getExtras().getString("Destination");
-            int realPower = Integer.parseInt(potencia) + 1;
-            System.out.println("RealPower es: " + realPower);
+            //int realPower = Integer.parseInt(potencia) + 1;
+            //System.out.println("RealPower es: " + realPower);
             System.out.println("Estos son los valores que recibí: Potencia, netID, nodeID, destination " + potencia + " " + netID + " " + nodeID + " " + destination);
             try {
                 sendRadOn();
                 sendCommand();
                 writeNodeID(nodeID);
                 writeNodeID(nodeID);
-                writePower(Integer.toString(realPower));
+                writePower(potencia);
                 writeNetID(netID);
                 writeDestination(destination);
                 saveValues();
