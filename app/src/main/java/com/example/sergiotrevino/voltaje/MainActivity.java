@@ -186,7 +186,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                             readMessage(a);
                                         }
                                     }else{
-                                        System.out.println("No es status: " + s + " length: " + s.length());
+                                        System.out.println(s);
 
                                         if(control.matches("Config")){
                                             System.out.println("Config");
@@ -264,6 +264,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     System.out.println("Estoy en sendNetID");
                     String msg = "ATS3?\r";
                     outputStream.write(msg.getBytes());
+                    outputStream.write(msg.getBytes());
                 }
                 catch (IOException ex) { }
             }
@@ -282,6 +283,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     atributo = "Power";
                     System.out.println("Estoy en sendPower");
                     String msg = "ATS4?\r";
+                    outputStream.write(msg.getBytes());
                     outputStream.write(msg.getBytes());
                 }
                 catch (IOException ex) { }
@@ -302,6 +304,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     System.out.println("Estoy en sendNodeID");
                     String msg = "ATS15?\r";
                     outputStream.write(msg.getBytes());
+                    outputStream.write(msg.getBytes());
+
                 }
                 catch (IOException ex) { }
 
@@ -344,7 +348,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void run(){
 
                 atributo = "NodeID";
-                System.out.println("Esta es la linea que lee Power: " + line + " Este es su tamaño: " + line.length());
+                System.out.println("Esta es la linea que lee Power: " + line );
                 if(line.length() > 5){
                     potenciaValue = line.substring(line.lastIndexOf("]") + 2, line.length() - 1);
                     System.out.println("Esto tiene potenciaValue: " + potenciaValue);
@@ -363,7 +367,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void run(){
                 atributo = "Power";
-                System.out.println("Esta es la linea que lee NetID: " + line + " Este es su tamaño: " + line.length());
+                System.out.println("Esta es la linea que lee NetID: " + line );
                 if(line.length() > 5){
                     netIDValue = line.substring(line.lastIndexOf("]") + 2, line.length() - 1);
                     System.out.println("Esto tiene netIDvalue: " + netIDValue);
@@ -380,7 +384,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void run(){
 
                 System.out.println("NodeID: " + line);
-                System.out.println("Esta es la linea que lee NodeID: " + line + " Este es su tamaño: " + line.length());
+                System.out.println("Esta es la linea que lee NodeID: " + line );
                 if(line.length() > 5){
                     nodeIDvalue = line.substring(line.lastIndexOf("]") + 2, line.length() - 1);
                     System.out.println("Esto tiene nodeIDvalue: " + nodeIDvalue);
@@ -536,7 +540,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         };
 
         Handler h = new Handler();
-        h.postDelayed(r, 600);
+        h.postDelayed(r, 700);
 
     }
 
@@ -551,6 +555,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     System.out.println(msg1);
                     outputStream.write(msg1.getBytes());
 
+
                 } catch (IOException ex) {
                 }
 
@@ -558,7 +563,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         };
 
         Handler h = new Handler();
-        h.postDelayed(r, 500);
+        h.postDelayed(r, 600);
 
     }
 
@@ -572,6 +577,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     String msg1 = "ATS4=" + power + "\r";
                     System.out.println(msg1);
                     outputStream.write(msg1.getBytes());
+                    outputStream.write(msg1.getBytes());
+
 
                 } catch (IOException ex) {
                 }
@@ -580,7 +587,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         };
 
         Handler h = new Handler();
-        h.postDelayed(r, 400);
+        h.postDelayed(r, 500);
 
     }
 
@@ -603,7 +610,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
         Handler h = new Handler();
-        h.postDelayed(r, 700);
+        h.postDelayed(r, 800);
 
     }
 
@@ -626,7 +633,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         };
 
         Handler h = new Handler();
-        h.postDelayed(r, 800);
+        h.postDelayed(r, 900);
 
     }
 
@@ -646,12 +653,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             String netID=data.getExtras().getString("NetID");
             String nodeID=data.getExtras().getString("NodeID");
             String destination=data.getExtras().getString("Destination");
+            int realPower = Integer.parseInt(potencia) + 1;
+            System.out.println("RealPower es: " + realPower);
             System.out.println("Estos son los valores que recibí: Potencia, netID, nodeID, destination " + potencia + " " + netID + " " + nodeID + " " + destination);
             try {
                 sendRadOn();
                 sendCommand();
-                writePower(potencia);
                 writeNodeID(nodeID);
+                writePower(Integer.toString(realPower));
                 writeNetID(netID);
                 writeDestination(destination);
                 saveValues();
